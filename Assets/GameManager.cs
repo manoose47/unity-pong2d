@@ -1,18 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public Ball ball;
     public Paddle paddle;
-
     public static Vector2 bottomLeft;
     public static Vector2 topRight;
     public static Vector2 resetPoint;
-
     public static int leftScore;
     public static int rightScore;
+    public Text scoreText;
     // Start is called before the first frame update
     void Start()
     {
@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public static void Score(bool isRightPaddle)
+    public void Score(bool isRightPaddle)
     {
         if (isRightPaddle)
         {
@@ -49,6 +49,12 @@ public class GameManager : MonoBehaviour
             leftScore++;
         }
 
+        UpdateScore(leftScore, rightScore);
+    }
+
+    private void UpdateScore(int leftScore, int rightScore)
+    {
+        scoreText.text = string.Format("{0} : {1}", leftScore, rightScore);
         if (leftScore > rightScore)
         {
             Debug.Log("Left player is winning: " + leftScore + ":" + rightScore);
@@ -61,10 +67,8 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("The score is a draw: " + rightScore + ":" + leftScore);
         }
-
     }
-
-    public static void Reset(GameObject gameObject)
+    public void Reset(GameObject gameObject)
     {
         gameObject.transform.position = resetPoint;
     }

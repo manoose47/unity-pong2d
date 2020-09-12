@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
+    private GameManager gameManager;
+
     [SerializeField]
     float speed;
     float radius;
@@ -11,6 +13,18 @@ public class Ball : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // okay... hurray. This will associate our gameManager object by tag with the Ball. 
+        // This allows us access to its class properties and functions with gameManager 
+        // Whilst references with GameManager will access its static properties. Fucking hell
+        GameObject controller = GameObject.FindGameObjectWithTag("GameManager");
+        if (controller != null)
+        {
+            gameManager = controller.GetComponent<GameManager>();
+        }
+        else
+        {
+            Debug.Log("Cannot find game Manager");
+        }
         direction = Vector2.one.normalized; // starting direction
         radius = transform.localScale.x / 2;
     }
@@ -34,14 +48,14 @@ public class Ball : MonoBehaviour
 
         if (transform.position.x < GameManager.bottomLeft.x + radius && direction.x < 0)
         {
-            GameManager.Reset(this.gameObject);
-            GameManager.Score(true);
+            gameManager.Reset(this.gameObject);
+            gameManager.Score(true);
         }
 
         if (transform.position.x > GameManager.topRight.x - radius && direction.x > 0)
         {
-            GameManager.Reset(this.gameObject);
-            GameManager.Score(false);
+            gameManager.Reset(this.gameObject);
+            gameManager.Score(false);
         }
     }
 
