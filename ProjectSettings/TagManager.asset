@@ -9,6 +9,7 @@ TagManager:
   - TimerText
   - ScoreText
   - GameManager
+  - ShowGameState
   layers:
   - Default
   - TransparentFX

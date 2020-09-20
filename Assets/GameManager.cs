@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     public static int leftScore;
     public static int rightScore;
     public Text scoreText;
+    public Text stateText;
+
+    private GameObject gameStateObject;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,6 +33,10 @@ public class GameManager : MonoBehaviour
         paddle2.Init(false);
         leftScore = 0;
         rightScore = 0;
+
+        // hide the game over or paused text at runtime
+        gameStateObject = GameObject.FindGameObjectWithTag("ShowGameState");
+        gameStateObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -52,24 +59,47 @@ public class GameManager : MonoBehaviour
         UpdateScore(leftScore, rightScore);
     }
 
-    private void UpdateScore(int leftScore, int rightScore)
+    private string UpdateScore(int leftScore, int rightScore)
     {
         scoreText.text = string.Format("{0} : {1}", leftScore, rightScore);
         if (leftScore > rightScore)
         {
-            Debug.Log("Left player is winning: " + leftScore + ":" + rightScore);
+            return ("Left player wins: " + leftScore + ":" + rightScore);
         }
         else if (rightScore > leftScore)
         {
-            Debug.Log("Right player is winning: " + rightScore + ":" + leftScore);
+            return ("Right player wins: " + rightScore + ":" + leftScore);
         }
         else
         {
-            Debug.Log("The score is a draw: " + rightScore + ":" + leftScore);
+            return ("The score is a draw: " + rightScore + ":" + leftScore);
         }
     }
     public void Reset(GameObject gameObject)
     {
         gameObject.transform.position = resetPoint;
+    }
+
+    public void GameOver()
+    {
+        scoreText.text = UpdateScore(leftScore, rightScore);
+        stateText.text = "Game Over";
+        gameStateObject.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    public void TogglePause()
+    {
+        stateText.text = "Paused";
+        if (Time.timeScale == 1)
+        {
+            gameStateObject.SetActive(true);
+            Time.timeScale = 0;
+        }
+        else
+        {
+            gameStateObject.SetActive(false);
+            Time.timeScale = 1;
+        }
     }
 }
