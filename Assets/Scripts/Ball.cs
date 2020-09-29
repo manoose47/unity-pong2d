@@ -9,6 +9,14 @@ public class Ball : MonoBehaviour
     [SerializeField]
     float speed;
     float radius;
+
+    public AudioClip[] bounceSounds;
+
+    public AudioClip[] paddleSounds;
+
+    public AudioClip scoreSound;
+
+    public AudioSource _audioSource;
     Vector2 direction;
     // Start is called before the first frame update
     void Start()
@@ -16,6 +24,9 @@ public class Ball : MonoBehaviour
         // okay... hurray. This will associate our gameManager object by tag with the Ball. 
         // This allows us access to its class properties and functions with gameManager 
         // Whilst references with GameManager will access its static properties. Fucking hell
+        _audioSource = GetComponent<AudioSource>();
+
+
         GameObject controller = GameObject.FindGameObjectWithTag("GameManager");
         if (controller != null)
         {
@@ -34,26 +45,31 @@ public class Ball : MonoBehaviour
     {
         transform.Translate(direction * speed * Time.deltaTime);
 
+
         // if ball is hitting the bottom of boundary, invert its direction
         if (transform.position.y < GameManager.bottomLeft.y + radius && direction.y < 0)
         {
             direction.y = -direction.y;
+            playBounce();
         }
 
         // the reverse of the above
         if (transform.position.y > GameManager.topRight.y - radius && direction.y > 0)
         {
             direction.y = -direction.y;
+            playBounce();
         }
 
         if (transform.position.x < GameManager.bottomLeft.x + radius && direction.x < 0)
         {
+            playScore();
             gameManager.Reset(this.gameObject);
             gameManager.Score(true);
         }
 
         if (transform.position.x > GameManager.topRight.x - radius && direction.x > 0)
         {
+            playScore();
             gameManager.Reset(this.gameObject);
             gameManager.Score(false);
         }
@@ -67,12 +83,32 @@ public class Ball : MonoBehaviour
 
             if (isRight && direction.x > 0)
             {
+                playPaddle();
                 direction.x = -direction.x;
             }
             if (!isRight && direction.x < 0)
             {
+                playPaddle();
                 direction.x = -direction.x;
             }
         }
+    }
+
+    private void playBounce()
+    {
+        _audioSource.clip = bounceSounds[Random.Range(0, bounceSounds.Length)];
+        _audioSource.Play();
+    }
+
+    private void playPaddle()
+    {
+        _audioSource.clip = paddleSounds[Random.Range(0, paddleSounds.Length)];
+        _audioSource.Play();
+    }
+
+    private void playScore()
+    {
+        _audioSource.clip = scoreSound;
+        _audioSource.Play();
     }
 }
