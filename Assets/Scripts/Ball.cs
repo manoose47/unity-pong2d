@@ -9,6 +9,7 @@ public class Ball : MonoBehaviour
     [SerializeField]
     float speed;
     float radius;
+    float startingSpeed;
 
     public AudioClip[] bounceSounds;
 
@@ -25,7 +26,8 @@ public class Ball : MonoBehaviour
         // This allows us access to its class properties and functions with gameManager 
         // Whilst references with GameManager will access its static properties. Fucking hell
         _audioSource = GetComponent<AudioSource>();
-
+        speed = speed > 0 ? speed : 5.0f;
+        startingSpeed = speed;
 
         GameObject controller = GameObject.FindGameObjectWithTag("GameManager");
         if (controller != null)
@@ -50,6 +52,7 @@ public class Ball : MonoBehaviour
         if (transform.position.y < GameManager.bottomLeft.y + radius && direction.y < 0)
         {
             direction.y = -direction.y;
+            increaseSpeed();
             playBounce();
         }
 
@@ -57,12 +60,14 @@ public class Ball : MonoBehaviour
         if (transform.position.y > GameManager.topRight.y - radius && direction.y > 0)
         {
             direction.y = -direction.y;
+            increaseSpeed();
             playBounce();
         }
 
         if (transform.position.x < GameManager.bottomLeft.x + radius && direction.x < 0)
         {
             playScore();
+            resetSpeed();
             gameManager.Reset(this.gameObject);
             gameManager.Score(true);
         }
@@ -70,6 +75,7 @@ public class Ball : MonoBehaviour
         if (transform.position.x > GameManager.topRight.x - radius && direction.x > 0)
         {
             playScore();
+            resetSpeed();
             gameManager.Reset(this.gameObject);
             gameManager.Score(false);
         }
@@ -84,11 +90,13 @@ public class Ball : MonoBehaviour
             if (isRight && direction.x > 0)
             {
                 playPaddle();
+                increaseSpeed();
                 direction.x = -direction.x;
             }
             if (!isRight && direction.x < 0)
             {
                 playPaddle();
+                increaseSpeed();
                 direction.x = -direction.x;
             }
         }
@@ -110,5 +118,15 @@ public class Ball : MonoBehaviour
     {
         _audioSource.clip = scoreSound;
         _audioSource.Play();
+    }
+
+    private void increaseSpeed()
+    {
+        speed++;
+    }
+
+    private void resetSpeed()
+    {
+        speed = startingSpeed;
     }
 }
