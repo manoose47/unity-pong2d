@@ -10,6 +10,7 @@ public class Ball : MonoBehaviour
     float speed;
     float radius;
     float startingSpeed;
+    int paddleCounter;
 
     public AudioClip[] bounceSounds;
 
@@ -28,6 +29,7 @@ public class Ball : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         speed = speed > 0 ? speed : 5.0f;
         startingSpeed = speed;
+        paddleCounter = 0;
 
         GameObject controller = GameObject.FindGameObjectWithTag("GameManager");
         if (controller != null)
@@ -47,35 +49,28 @@ public class Ball : MonoBehaviour
     {
         transform.Translate(direction * speed * Time.deltaTime);
 
-
-        // if ball is hitting the bottom of boundary, invert its direction
-        if (transform.position.y < GameManager.bottomLeft.y + radius && direction.y < 0)
+        if (touchingVerticalBoundary())
         {
-            direction.y = -direction.y;
-            increaseSpeed();
-            playBounce();
+            ricochet(true);
+            playAudio(bounceSounds, null);
         }
 
-        // the reverse of the above
-        if (transform.position.y > GameManager.topRight.y - radius && direction.y > 0)
-        {
-            direction.y = -direction.y;
-            increaseSpeed();
-            playBounce();
-        }
-
-        if (transform.position.x < GameManager.bottomLeft.x + radius && direction.x < 0)
+        if (transform.position.x < GameManager.bottomLeft.x && direction.x < 0)
         {
             playScore();
             resetSpeed();
+            paddleCounter = 0;
+            gameManager.updateRallyCounter(0);
             gameManager.Reset(this.gameObject);
             gameManager.Score(true);
         }
 
-        if (transform.position.x > GameManager.topRight.x - radius && direction.x > 0)
+        if (transform.position.x > GameManager.topRight.x && direction.x > 0)
         {
             playScore();
             resetSpeed();
+            paddleCounter = 0;
+            gameManager.updateRallyCounter(0);
             gameManager.Reset(this.gameObject);
             gameManager.Score(false);
         }
@@ -83,37 +78,17 @@ public class Ball : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "Paddle")
+        if (touchingPaddle(other))
         {
-            bool isRight = other.GetComponent<Paddle>().isRight;
-
-            if (isRight && direction.x > 0)
+            paddleCounter++;
+            if (paddleCounter % 2 == 0)
             {
-                playPaddle();
-                increaseSpeed();
-                direction.x = -direction.x;
+                gameManager.updateRallyCounter(paddleCounter / 2);
             }
-            if (!isRight && direction.x < 0)
-            {
-                playPaddle();
-                increaseSpeed();
-                direction.x = -direction.x;
-            }
+            ricochet(false);
+            playAudio(paddleSounds, null);
         }
     }
-
-    private void playBounce()
-    {
-        _audioSource.clip = bounceSounds[Random.Range(0, bounceSounds.Length)];
-        _audioSource.Play();
-    }
-
-    private void playPaddle()
-    {
-        _audioSource.clip = paddleSounds[Random.Range(0, paddleSounds.Length)];
-        _audioSource.Play();
-    }
-
     private void playScore()
     {
         _audioSource.clip = scoreSound;
@@ -123,10 +98,54 @@ public class Ball : MonoBehaviour
     private void increaseSpeed()
     {
         speed++;
+        gameManager.increasePaddleSpeed(speed);
     }
 
     private void resetSpeed()
     {
         speed = startingSpeed;
     }
+
+    private bool touchingVerticalBoundary()
+    {
+        var ballTouchingBottomBoundary = transform.position.y < GameManager.bottomLeft.y + radius && direction.y < 0;
+        var ballTouchingTopBoundary = transform.position.y > GameManager.topRight.y - radius && direction.y > 0;
+
+        return ballTouchingBottomBoundary || ballTouchingTopBoundary;
+    }
+
+    private void ricochet(bool isVerticalRicochet)
+    {
+        if (isVerticalRicochet)
+        {
+            direction.y = -direction.y;
+        }
+        else
+        {
+            direction.x = -direction.x;
+        }
+
+        increaseSpeed();
+    }
+
+    private void playAudio(AudioClip[] clips, AudioClip clip)
+    {
+        _audioSource.clip = clips != null ? clips[Random.Range(0, clips.Length)] : clip;
+        _audioSource.Play();
+    }
+
+    private bool touchingPaddle(Collider2D other)
+    {
+        if (other.tag == "Paddle")
+        {
+            bool isRight = other.GetComponent<Paddle>().isRight;
+
+            var touchingRightPaddle = isRight && direction.x > 0;
+            var touchingLeftPaddle = !isRight && direction.x < 0;
+
+            return touchingRightPaddle || touchingLeftPaddle;
+        }
+        return false;
+    }
+
 }

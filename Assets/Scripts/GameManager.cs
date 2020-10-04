@@ -15,6 +15,13 @@ public class GameManager : MonoBehaviour
     public Text scoreText;
     public Text stateText;
 
+    int currentRally;
+    int bestRally;
+
+    int ricochetCount;
+
+    int bestRicochetCount;
+
     private GameObject gameStateObject;
     // Start is called before the first frame update
     void Start()
@@ -101,5 +108,26 @@ public class GameManager : MonoBehaviour
             gameStateObject.SetActive(false);
             Time.timeScale = 1;
         }
+    }
+
+    public void increasePaddleSpeed(float speed)
+    {
+        var paddles = GameObject.FindGameObjectsWithTag("Paddle");
+        foreach (var paddle in paddles)
+        {
+            var paddleScript = paddle.GetComponent<Paddle>();
+            if (paddleScript.speed < speed)
+            {
+                paddleScript.speed = speed;
+            }
+        }
+    }
+
+    public void updateRallyCounter(int rallyCount)
+    {
+        bestRally = rallyCount > bestRally ? rallyCount : bestRally;
+        currentRally = rallyCount;
+        Debug.Log("Rally count: " + rallyCount);
+        Debug.Log("Best rally: " + bestRally);
     }
 }

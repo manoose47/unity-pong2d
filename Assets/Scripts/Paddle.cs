@@ -6,7 +6,7 @@ public class Paddle : MonoBehaviour
 {
     // Start is called before the first frame update
     [SerializeField]
-    float speed;
+    public float speed;
     float height;
     string input;
 

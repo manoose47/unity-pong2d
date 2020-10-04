@@ -140,9 +140,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 8531ffbdecf2de047bbe8b93a0ef2f6b, type: 3}
   - {fileID: 8300000, guid: fdb2fec841ba51c42b8a19aacfa00d5d, type: 3}
   - {fileID: 8300000, guid: 8ba638112dfc552429dc55b2d5684d22, type: 3}
-  - {fileID: 8300000, guid: 65f2231edc9901044990d2e536f72ad5, type: 3}
-  - {fileID: 8300000, guid: 764937df025fbbb4c89dfd88cc2a0e33, type: 3}
-  - {fileID: 8300000, guid: 764937df025fbbb4c89dfd88cc2a0e33, type: 3}
+  - {fileID: 8300000, guid: 349d9aba62cfe5e488461fe42a68b63c, type: 3}
   paddleSounds:
   - {fileID: 8300000, guid: dc8562762ee7b7846bc6726e28355722, type: 3}
   - {fileID: 8300000, guid: 4a19671278c0a524db97ad212bfc6321, type: 3}
