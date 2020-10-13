@@ -10,6 +10,7 @@ TagManager:
   - ScoreText
   - GameManager
   - ShowGameState
+  - SceneLoader
   layers:
   - Default
   - TransparentFX

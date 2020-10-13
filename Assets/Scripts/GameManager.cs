@@ -15,6 +15,9 @@ public class GameManager : MonoBehaviour
     public Text scoreText;
     public Text stateText;
 
+    [SerializeField]
+    int maxScore;
+
     int currentRally;
     int bestRally;
 
@@ -23,6 +26,8 @@ public class GameManager : MonoBehaviour
     int bestRicochetCount;
 
     private GameObject gameStateObject;
+
+    private sceneLoader sceneLoader;
     // Start is called before the first frame update
     void Start()
     {
@@ -44,6 +49,17 @@ public class GameManager : MonoBehaviour
         // hide the game over or paused text at runtime
         gameStateObject = GameObject.FindGameObjectWithTag("ShowGameState");
         gameStateObject.SetActive(false);
+
+        GameObject controller = GameObject.FindGameObjectWithTag("SceneLoader");
+
+        if (controller != null)
+        {
+            sceneLoader = controller.GetComponent<sceneLoader>();
+        }
+        else
+        {
+            Debug.Log("Cannot find scene loader");
+        }
     }
 
     // Update is called once per frame
@@ -66,20 +82,15 @@ public class GameManager : MonoBehaviour
         UpdateScore(leftScore, rightScore);
     }
 
-    private string UpdateScore(int leftScore, int rightScore)
+    private void UpdateScore(int leftScore, int rightScore)
     {
         scoreText.text = string.Format("{0} : {1}", leftScore, rightScore);
-        if (leftScore > rightScore)
+        if (leftScore + rightScore >= maxScore)
         {
-            return ("Left player wins: " + leftScore + ":" + rightScore);
-        }
-        else if (rightScore > leftScore)
-        {
-            return ("Right player wins: " + rightScore + ":" + leftScore);
-        }
-        else
-        {
-            return ("The score is a draw: " + rightScore + ":" + leftScore);
+            if (DifferenceOfTwo())
+            {
+                GameOver();
+            }
         }
     }
     public void Reset(GameObject gameObject)
@@ -89,7 +100,7 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        scoreText.text = UpdateScore(leftScore, rightScore);
+        sceneLoader.LoadNextScene();
         stateText.text = "Game Over";
         gameStateObject.SetActive(true);
         Time.timeScale = 0;
@@ -130,4 +141,18 @@ public class GameManager : MonoBehaviour
         Debug.Log("Rally count: " + rallyCount);
         Debug.Log("Best rally: " + bestRally);
     }
+
+    private bool DifferenceOfTwo()
+    {
+        int result = leftScore - rightScore;
+        if (result < 0)
+        {
+            result *= -1;
+        }
+
+        return result >= 2;
+    }
+
 }
+
+// need to find a way to persist data between different scenes. YOU MUG
