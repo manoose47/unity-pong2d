@@ -27,6 +27,8 @@ public class GameManager : MonoBehaviour
 
     private GameObject gameStateObject;
 
+    private bool drawGame;
+
     private sceneLoader sceneLoader;
     // Start is called before the first frame update
     void Start()
@@ -45,6 +47,7 @@ public class GameManager : MonoBehaviour
         paddle2.Init(false);
         leftScore = 0;
         rightScore = 0;
+        drawGame = true;
 
         // hide the game over or paused text at runtime
         gameStateObject = GameObject.FindGameObjectWithTag("ShowGameState");
@@ -100,10 +103,15 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
+        drawGame = leftScore == rightScore ? true : false;
+        State.stats = new Stats()
+        {
+            Winner = drawGame ? "Draw Game Boooo" : leftScore > rightScore ? "Left Player Wins" : "Right Player Wins",
+            Score = scoreText.text,
+            Rallies = bestRally.ToString(),
+            Ricochets = bestRicochetCount.ToString()
+        };
         sceneLoader.LoadNextScene();
-        stateText.text = "Game Over";
-        gameStateObject.SetActive(true);
-        Time.timeScale = 0;
     }
 
     public void TogglePause()
@@ -140,6 +148,12 @@ public class GameManager : MonoBehaviour
         currentRally = rallyCount;
         Debug.Log("Rally count: " + rallyCount);
         Debug.Log("Best rally: " + bestRally);
+    }
+
+    public void UpdateRicochetCounter(int hitCounter)
+    {
+        bestRicochetCount = hitCounter > bestRicochetCount ? hitCounter : bestRicochetCount;
+        ricochetCount = hitCounter;
     }
 
     private bool DifferenceOfTwo()

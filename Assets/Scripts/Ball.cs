@@ -11,6 +11,7 @@ public class Ball : MonoBehaviour
     float radius;
     float startingSpeed;
     int paddleCounter;
+    int hitCounter;
 
     public AudioClip[] bounceSounds;
 
@@ -30,6 +31,7 @@ public class Ball : MonoBehaviour
         speed = speed > 0 ? speed : 5.0f;
         startingSpeed = speed;
         paddleCounter = 0;
+        hitCounter = 0;
 
         GameObject controller = GameObject.FindGameObjectWithTag("GameManager");
         if (controller != null)
@@ -125,6 +127,8 @@ public class Ball : MonoBehaviour
             direction.x = -direction.x;
         }
 
+        hitCounter++;
+        gameManager.UpdateRicochetCounter(hitCounter);
         increaseSpeed();
     }
 
