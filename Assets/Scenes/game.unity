@@ -358,7 +358,7 @@ MonoBehaviour:
   paddle: {fileID: 2654601539416237787, guid: 83ede2434509f1f42b4a71830a1a688d, type: 3}
   scoreText: {fileID: 1641895774}
   stateText: {fileID: 461434108}
-  maxScore: 7
+  maxScore: 8
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
