@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Secret messages
+
 public class Ball : MonoBehaviour
 {
     private GameManager gameManager;
