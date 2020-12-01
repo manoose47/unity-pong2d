@@ -7,63 +7,65 @@ public class Paddle : MonoBehaviour
     // Start is called before the first frame update
     [SerializeField]
     public float speed;
-    float height;
-    string input;
+
+    [SerializeField]
+    public Rigidbody2D paddleRigidBody;
+
+    [SerializeField]
+    public AudioClip[] paddleSounds;
+
+    private float movement;
 
     public bool isRight;
 
+    private Vector2 startPosition;
+    private int paddleCounter;
+
+    private AudioSource _audioSource;
+
     void Start()
     {
-        height = transform.localScale.y;
-
+        startPosition = transform.position;
+        paddleCounter = 0;
+        _audioSource = GetComponent<AudioSource>();
     }
 
-    public void Init(bool isRightPaddle)
+    void Update()
     {
-        // Sets if paddle is right or left hand side on the paddle object, so that it can be referenced later
-        isRight = isRightPaddle;
-
-        Vector2 position = Vector2.zero;
-
-        // defines Paddle starting position where x = maxRight || x = maxLeft, && y = 0
-        if (isRightPaddle)
+        if (isRight)
         {
-            position = new Vector2(GameManager.topRight.x, 0);
-            // offset the x position by the width of the paddle, so that its not clipping the edge
-            position -= Vector2.right * transform.localScale.x;
-            // assign the control scheme
-            input = "PaddleRight";
+            movement = Input.GetAxisRaw("PaddleRight");
         }
         else
         {
-            position = new Vector2(GameManager.bottomLeft.x, 0);
-            position -= Vector2.left * transform.localScale.x;
-            input = "PaddleLeft";
+            movement = Input.GetAxisRaw("PaddleLeft");
         }
 
-        transform.position = position;
-        transform.name = input;
-
+        paddleRigidBody.velocity = new Vector2(paddleRigidBody.velocity.x, movement * speed);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Reset()
     {
-        // input is 1 or 0, time.deltaTime will ensure that framerate doesnt effect movement speed, speed it custom var
-        float move = Input.GetAxis(input) * Time.deltaTime * speed;
+        transform.position = startPosition;
+    }
 
-        // prevent paddle moving off screen
-        // if y is less than lowest point onscreen (+ height/2 for offset) && movement is down
-        if (transform.position.y < GameManager.bottomLeft.y + height / 2 && move < 0)
-        {
-            move = 0;
-        }
-        // if y is greater than highest point onscreen (- height/2 for offset) && movement is up
-        if (transform.position.y > GameManager.topRight.y - height / 2 && move > 0)
-        {
-            move = 0;
-        }
+    void OnCollisionEnter2D(Collision2D collision)
+    {
 
-        transform.Translate(move * Vector2.up);
+        if (collision.gameObject.CompareTag("Ball"))
+        {
+            paddleCounter++;
+            if (paddleCounter % 2 == 0)
+            {
+                GameObject.Find("GameManager").GetComponent<GameManager>().updateRallyCounter(paddleCounter / 2);
+            }
+            playAudio(paddleSounds, null);
+        }
+    }
+
+    private void playAudio(AudioClip[] clips, AudioClip clip)
+    {
+        _audioSource.clip = clips != null ? clips[Random.Range(0, clips.Length)] : clip;
+        _audioSource.Play();
     }
 }

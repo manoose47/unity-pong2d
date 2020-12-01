@@ -11,6 +11,8 @@ TagManager:
   - GameManager
   - ShowGameState
   - SceneLoader
+  - Goal
+  - Barrier
   layers:
   - Default
   - TransparentFX

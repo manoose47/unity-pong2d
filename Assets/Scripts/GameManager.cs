@@ -5,8 +5,12 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public Ball ball;
-    public Paddle paddle;
+    [SerializeField]
+    public GameObject ball;
+    [SerializeField]
+    public GameObject LeftHandSidePaddle;
+    [SerializeField]
+    public GameObject RightHandSidePaddle;
     public static Vector2 bottomLeft;
     public static Vector2 topRight;
     public static Vector2 resetPoint;
@@ -33,23 +37,10 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Instantiate(ball);
-        ball.transform.position = resetPoint;
-
-        // convert cameras screen coordinate into games screen coordinate
-        bottomLeft = Camera.main.ScreenToWorldPoint(new Vector2(0, 0));
-        topRight = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
-
-        // Create 2 paddles, one on left and one on right, not sure why we have to cast
-        Paddle paddle1 = Instantiate(paddle) as Paddle;
-        Paddle paddle2 = Instantiate(paddle) as Paddle;
-        paddle1.Init(true);
-        paddle2.Init(false);
         leftScore = 0;
         rightScore = 0;
         drawGame = true;
 
-        // hide the game over or paused text at runtime
         gameStateObject = GameObject.FindGameObjectWithTag("ShowGameState");
         gameStateObject.SetActive(false);
 
@@ -71,15 +62,15 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void Score(bool isRightPaddle)
+    public void Score(bool isGoalRHS)
     {
-        if (isRightPaddle)
+        if (isGoalRHS)
         {
-            rightScore++;
+            leftScore++;
         }
         else
         {
-            leftScore++;
+            rightScore++;
         }
 
         UpdateScore(leftScore, rightScore);
@@ -95,10 +86,16 @@ public class GameManager : MonoBehaviour
                 GameOver();
             }
         }
+        else
+        {
+            Reset();
+        }
     }
-    public void Reset(GameObject gameObject)
+    public void Reset()
     {
-        gameObject.transform.position = resetPoint;
+        LeftHandSidePaddle.GetComponent<Paddle>().Reset();
+        RightHandSidePaddle.GetComponent<Paddle>().Reset();
+        ball.GetComponent<Ball>().Reset();
     }
 
     public void GameOver()
